@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Académico - MINEDU</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --minedu-blue: #0072bc; --bg-light: #f0f4f7; --sidebar-w: 260px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg-light); overflow: hidden; }
+        
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .logo-top { background: #333; color: white; padding: 10px; font-size: 0.7rem; display: flex; align-items: center; }
+        .user-card { padding: 20px; text-align: center; border-bottom: 1px solid #eee; }
+        .user-card img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #ddd; }
+        .user-card p { font-size: 0.75rem; font-weight: bold; margin: 10px 0 0; text-transform: uppercase; }
+        
+        /* NAVEGACIÓN */
+        .nav-link { padding: 12px 20px; display: flex; align-items: center; color: #666; font-size: 0.85rem; cursor: pointer; transition: 0.3s; }
+        .nav-link:hover { background: #f8f9fa; }
+        .nav-link i { width: 25px; }
+        .active-menu { background: #00bcd4 !important; color: white !important; }
+        .submenu { background: #fafafa; display: none; }
+        .submenu.open { display: block; }
+        .sub-item { padding: 10px 20px 10px 45px; display: block; font-size: 0.8rem; color: #777; cursor: pointer; border-left: 3px solid transparent; }
+        .sub-active { color: var(--minedu-blue); font-weight: bold; background: #eef7ff; border-left-color: var(--minedu-blue); }
+
+        /* CONTENIDO */
+        .main { flex-grow: 1; display: flex; flex-direction: column; }
+        header { background: var(--minedu-blue); height: 50px; color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .container { padding: 25px; overflow-y: auto; flex-grow: 1; }
+        .breadcrumb { text-align: right; font-size: 0.75rem; color: #aaa; margin-bottom: 15px; }
+        .card { background: white; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
+        /* ESTILOS DE FORMULARIO E INFORMACIÓN */
+        .form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px; }
+        .input-box { display: flex; flex-direction: column; }
+        .input-box label { font-size: 0.7rem; color: #999; }
+        .input-box input, .input-box select { border: none; border-bottom: 1px solid #ccc; padding: 5px 0; outline: none; font-size: 0.85rem; }
+        
+        .profile-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .info-field { margin-bottom: 15px; }
+        .info-field label { display: block; font-size: 0.7rem; color: #999; }
+        .info-field span { display: block; border-bottom: 1px solid #eee; padding: 3px 0; font-size: 0.85rem; }
+
+        /* PDF VISOR */
+        #pdf-container { display: none; background: #525659; padding: 20px; border-radius: 4px; text-align: center; }
+        .pdf-mock { background: white; width: 100%; max-width: 800px; height: 500px; margin: 0 auto; box-shadow: 0 0 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: #999; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-top">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Escudo_nacional_del_Per%C3%BA.svg/1200px-Escudo_nacional_del_Per%C3%BA.svg.png" width="20" style="margin-right:8px">
+            PERÚ | Ministerio de Educación
+        </div>
+        <div class="user-card">
+            <img src="descarga" alt="Avatar">
+            <p>ROBLES DAVILA, BERTRAND MARCELO</p>
+            <small style="color:#aaa; font-size: 10px;">DESARROLLO DE SISTEMAS DE INF.</small>
+        </div>
+        
+        <nav style="margin-top:10px">
+            <div class="nav-link active-menu" onclick="loadPage('inicio')"><i class="fa fa-home"></i> Inicio</div>
+            
+            <div class="nav-link" onclick="toggleSub('sub-est')"><i class="fa fa-user-graduate"></i> Estudiante <i class="fa fa-chevron-down" style="margin-left:auto; font-size:0.7rem"></i></div>
+            <div id="sub-est" class="submenu">
+                <div class="sub-item" onclick="loadPage('info-gen')">Información General</div>
+                <div class="sub-item" onclick="loadPage('perfil')">Perfil del Estudiante</div>
+            </div>
+
+            <div class="nav-link" onclick="toggleSub('sub-rep')"><i class="fa fa-chart-bar"></i> Reportes <i class="fa fa-chevron-down" style="margin-left:auto; font-size:0.7rem"></i></div>
+            <div id="sub-rep" class="submenu">
+                <div class="sub-item" onclick="loadPage('boleta')">Boleta de Notas</div>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header>
+            <i class="fa fa-bars"></i>
+            <div style="font-size: 0.75rem;"><i class="fa fa-history"></i> Periodo Lectivo: 2025-2</div>
+        </header>
+        
+        <div class="container" id="content-area">
+            </div>
+    </main>
+
+    <template id="page-inicio">
+        <div class="breadcrumb">Home > Portal Académico</div>
+        <h3 style="font-weight: normal; margin-bottom: 25px;">Portal Académico del Estudiante</h3>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+            <div class="card">
+                <div style="background: var(--minedu-blue); color: white; padding: 15px;">
+                    Institución Educativa: IEST PÚBLICO JOSE PARDO <br><small>Código modular: 0450114</small>
+                </div>
+                <img src="MINEDU.jpg" style="width:100%; height:250px; object-fit:cover;">
+                <div style="padding: 15px; font-size: 0.8rem; color: #666;">
+                    LIMA - LIMA - LA VICTORIA <br>
+                    <strong>Dirección: AVENIDA GRAU 620</strong> <br>
+                    Pagina Web: <a href="http://www.jpardo.edu.pe" target="_blank" style="color:var(--minedu-blue)">www.jpardo.edu.pe</a>
+                </div>
+            </div>
+            <div class="card">
+                <div style="background: #3498db; color: white; padding: 15px;">Soporte al Estudiante</div>
+                <div style="padding: 20px; color: #888; font-size: 0.85rem;">
+                    <p><i class="fa fa-envelope"></i> Email:</p>
+                    <p><i class="fa fa-phone"></i> Teléfono:</p>
+                    <p><i class="fa fa-mobile-alt"></i> Celular:</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="page-info-gen">
+        <div class="breadcrumb">Inicio > Información General</div>
+        <h3 style="font-weight: normal;">Información General</h3>
+        <div class="card">
+            <div style="padding: 15px 20px; border-bottom: 1px solid #eee; font-weight: bold;">Datos Personales</div>
+            <div class="form-row">
+                <div class="input-box"><label>Tipo de documento *</label><select><option>D.N.I.</option></select></div>
+                <div class="input-box"><label>Número de documento *</label><input type="text" value="77025205"></div>
+                <div class="input-box"><label>Sexo</label><select><option>MASCULINO</option></select></div>
+                <div class="input-box"><label>Apellido paterno *</label><input type="text" value="ROBLES"></div>
+                <div class="input-box"><label>Apellido materno *</label><input type="text" value="DAVILA"></div>
+                <div class="input-box"><label>Nombres *</label><input type="text" value="BERTRAND MARCELO"></div>
+                <div class="input-box"><label>Fecha de nacimiento *</label><input type="text" value="27/04/2001"></div>
+                <div class="input-box"><label>Lengua materna *</label><select><option>ESPAÑOL</option></select></div>
+                <div class="input-box"><label>¿Tiene discapacidad? *</label><select><option>NO</option></select></div>
+                <div class="input-box"><label>País residencia *</label><select><option>PERU</option></select></div>
+                <div class="input-box" style="grid-column: span 2;"><label>Correo electrónico *</label><input type="text" value="BERTANDMARCELOROBLESDAVILA@GMAIL.COM"></div>
+            </div>
+            <div style="text-align: center; padding-bottom: 20px;">
+                <button style="background: var(--minedu-blue); color: white; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer;">
+                    <i class="fa fa-save"></i> Actualizar Información
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <template id="page-perfil">
+        <div class="breadcrumb">Inicio > Perfil del Estudiante</div>
+        <h3 style="font-weight: normal;">Perfil del Estudiante</h3>
+        <div class="card" style="display: flex; align-items: center; padding: 20px; gap: 20px;">
+            <img src="descarga" style="border-radius: 50%; border: 4px solid #f0f0f0;">
+            <div>
+                <div style="font-weight: bold; font-size: 1.1rem;">ROBLES DAVILA, BERTRAND MARCELO</div>
+                <div style="color: #888; font-size: 0.85rem;">Estudiante de DESARROLLO DE SISTEMAS DE INFORMACIÓN - PROFESIONAL TÉCNICO</div>
+            </div>
+        </div>
+        <div class="profile-grid">
+            <div class="card" style="padding: 20px;">
+                <h4 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Acerca de mi</h4>
+                <div class="info-field"><label><i class="fa fa-calendar"></i> Fecha de Nacimiento:</label><span>27/04/2001</span></div>
+                <div class="info-field"><label><i class="fa fa-phone"></i> Celular:</label><span>927509667</span></div>
+                <div class="info-field"><label><i class="fa fa-map-marker-alt"></i> Dirección:</label><span>JR. ANCASH 1187 BARRIOS ALTOS - CERCADO</span></div>
+            </div>
+            <div class="card" style="padding: 20px;">
+                <h4 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Información de Estudiante</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div class="info-field"><label>Nro Documento</label><span>77025205</span></div>
+                    <div class="info-field"><label>Periodo Ingreso</label><span>2025-1</span></div>
+                    <div class="info-field"><label>Situación</label><span>REGULAR</span></div>
+                </div>
+                <div class="info-field"><label>Programa de Estudio</label><span>DESARROLLO DE SISTEMAS DE INFORMACIÓN</span></div>
+                <div class="info-field"><label>Sede</label><span>INSTITUTO EDUCACION SUPERIOR T. JOSE PARDO</span></div>
+            </div>
+        </div>
+    </template>
+
+<template id="page-boleta">
+    <div class="breadcrumb">Inicio > Boleta de Notas</div>
+    <h3 style="font-weight: normal;">Boleta de Notas</h3>
+    
+    <div class="card" style="padding: 20px; display: flex; align-items: flex-end; gap: 15px;">
+        <div class="input-box" style="width: 300px;">
+            <label>Seleccione un periodo lectivo</label>
+            <select id="select-periodo">
+                <option value="">Seleccione...</option>
+                <option value="2025-2">2025-2</option>
+            </select>
+        </div>
+        <button onclick="buscarBoleta()" style="background: var(--minedu-blue); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">
+            Buscar
+        </button>
+    </div>
+
+    <div id="pdf-container" style="display: none; background: #525659; border-radius: 4px; overflow: hidden;">
+        <div style="background: #323639; color: white; padding: 10px; display: flex; justify-content: space-between; font-size: 0.8rem;">
+            <span><i class="fa fa-file-pdf"></i> Boleta_Notas_2025-2.pdf</span>
+            <div>
+                <i class="fa fa-print" style="margin-right:15px; cursor:pointer"></i> 
+                <i class="fa fa-download" style="cursor:pointer"></i>
+            </div>
+        </div>
+        
+        <iframe 
+            src="Boleta_Notas2.pdf" 
+            width="100%" 
+            height="750px" 
+            style="border: none;">
+        </iframe>
+    </div>
+</template>
+
+    <script>
+        function toggleSub(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        function loadPage(pageId) {
+            const template = document.getElementById('page-' + pageId);
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = '';
+            contentArea.appendChild(template.content.cloneNode(true));
+            
+            // Lógica para marcar sub-items activos
+            document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('sub-active'));
+        }
+
+        function buscarBoleta() {
+            const periodo = document.getElementById('select-periodo').value;
+            if (periodo === "2025-2") {
+                document.getElementById('pdf-container').style.display = 'block';
+            } else {
+                alert("Por favor seleccione un periodo válido (2025-2)");
+            }
+        }
+
+        // Carga inicial
+        loadPage('inicio');
+    </script>
+</body>
+</html>

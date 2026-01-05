@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Portal Académico - MINEDU</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --minedu-blue: #1877f2; --bg-color: #f0f2f5; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        
+        .login-card { background: white; width: 420px; padding: 40px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .logo-container { margin-bottom: 25px; }
+        .logo-container img { width: 220px; }
+        
+        h2 { font-size: 1.4rem; color: #444; margin-bottom: 30px; font-weight: 500; }
+        
+        .input-group { margin-bottom: 20px; position: relative; text-align: left; }
+        .input-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 5px; }
+        .input-group input, .input-group select { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; 
+            box-sizing: border-box; font-size: 0.9rem; outline: none;
+        }
+        .input-group input:focus { border-color: var(--minedu-blue); }
+        
+        /* Estilo para el icono del ojo */
+        .toggle-password {
+            position: absolute; right: 12px; top: 12px; 
+            color: #aaa; cursor: pointer; font-size: 1rem;
+        }
+        .toggle-password:hover { color: #666; }
+
+        .captcha-area { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 20px 0; background: #fdfdfd; padding: 10px; border: 1px dashed #ccc; border-radius: 4px; }
+        #captcha-code { font-family: 'Courier New', Courier, monospace; font-size: 1.8rem; font-weight: bold; letter-spacing: 6px; color: #444; user-select: none; padding: 5px 10px; }
+        .refresh-btn { cursor: pointer; color: var(--minedu-blue); transition: transform 0.3s; }
+        .refresh-btn:active { transform: rotate(180deg); }
+
+        .btn-ingresar { width: 100%; padding: 13px; background-color: var(--minedu-blue); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-ingresar:hover { background-color: #166fe5; }
+        
+        #step-2 { display: none; }
+        select { background-color: #fff; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card" id="step-1">
+        <div class="logo-container">
+            <img src="logo-minedu.png" alt="Logo MINEDU">
+        </div>
+        <h2>Inicie Sesión</h2>
+        
+        <div class="input-group">
+            <input type="text" id="user-doc" placeholder="INGRESA TU NÚMERO DE DOCUMENTO">
+        </div>
+        
+        <div class="input-group">
+            <input type="password" id="user-pass" placeholder="INGRESA TU CONTRASEÑA">
+            <i class="fa fa-eye toggle-password" id="eye-icon" onclick="togglePassword()"></i>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="captcha-input" placeholder="INGRESA EL CÓDIGO EN LA IMAGEN">
+        </div>
+
+        <div class="captcha-area">
+            <div id="captcha-code">9Y9UU</div>
+            <i class="fa fa-sync-alt refresh-btn" title="Cambiar código" onclick="generateCaptcha()"></i>
+        </div>
+
+        <button class="btn-ingresar" onclick="validateStep1()">Ingresar</button>
+        
+        <div style="margin-top:20px; font-size:0.8rem;">
+            <a href="#" style="color:var(--minedu-blue); text-decoration:none;">¿Olvidaste tu contraseña?</a>
+        </div>
+    </div>
+
+    <div class="login-card" id="step-2">
+        <div class="logo-container">
+            <img src="logo-minedu.png" alt="Logo MINEDU">
+        </div>
+        <h3 style="font-weight: 400; color: #555; margin-bottom: 25px;">Instituciones y programas de estudios disponibles</h3>
+        
+        <div class="input-group">
+            <label>Selecciona tu institución</label>
+            <select>
+                <option>JOSE PARDO</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Selecciona un programa de estudios</label>
+            <select>
+                <option>DESARROLLO DE SISTEMAS DE INFORMACIÓN</option>
+            </select>
+        </div>
+
+        <button class="btn-ingresar" onclick="accessPortal()">Ingresar</button>
+    </div>
+
+    <script>
+        // Función para mostrar/ocultar contraseña
+        function togglePassword() {
+            const passInput = document.getElementById('user-pass');
+            const eyeIcon = document.getElementById('eye-icon');
+            
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type = "password";
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Generador de Captcha
+        function generateCaptcha() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 5; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('captcha-code').innerText = code;
+        }
+
+        // Validación de Paso 1
+        function validateStep1() {
+            const user = document.getElementById('user-doc').value;
+            const pass = document.getElementById('user-pass').value;
+            const capIn = document.getElementById('captcha-input').value.toUpperCase();
+            const capReal = document.getElementById('captcha-code').innerText;
+
+            if (user === "77025205" && pass === "dd*?i6e6N4g." && capIn === capReal) {
+                document.getElementById('step-1').style.display = 'none';
+                document.getElementById('step-2').style.display = 'block';
+            } else {
+                alert("Verifica tus datos o el código captcha.");
+                generateCaptcha();
+            }
+        }
+
+        function accessPortal() {
+            // Asegúrate de que tu archivo principal se llame index.html
+            window.location.href = "index.html";
+        }
+
+        window.onload = generateCaptcha;
+    </script>
+</body>
+</html>
